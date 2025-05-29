@@ -1,7 +1,7 @@
 package ui
 
 import (
-	"github.com/GueyeCoder/termtrack/controller"
+	controller "github.com/GueyeCoder/termtrack/controle"
 	"github.com/GueyeCoder/termtrack/model"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -11,27 +11,18 @@ func SetupUI(app *tview.Application, taskCtrl *controller.TaskController) tview.
 	taskList := tview.NewList().
 		ShowSecondaryText(false)
 
-	refresh := func() {
-		taskList.Clear()
-		tasks := taskCtrl.GetAll()
-		for _, t := range tasks {
-			title := t.Title
-			if t.Done {
-				title = "[green::b][✓] " + title
-			}
-			taskList.AddItem(title, "", 0, nil)
-		}
-	}
-
-	refresh()
-
 	tasks := taskCtrl.GetAll()
 	for _, t := range tasks {
 		title := t.Title
 		if t.Done {
 			title = "[green::b][✓] " + title
 		}
-		taskList.AddItem(title, "", 0, nil)
+		task := t
+		taskList.AddItem(title, "", 0, func() {
+			task.Done = !task.Done
+			taskCtrl.Update(task)
+			app.SetRoot(SetupUI(app, taskCtrl), true)
+		})
 	}
 
 	footer := tview.NewTextView().
@@ -50,12 +41,7 @@ func SetupUI(app *tview.Application, taskCtrl *controller.TaskController) tview.
 			app.Stop()
 		case 'a':
 			showAddForm(app, taskCtrl)
-		case 'd':
-			index := taskList.GetCurrentItem()
-			if index >= 0 {
-				taskCtrl.MarkDone(index) // méthode à implémenter dans taskCtrl
-				refresh()
-			}
+			return nil
 		}
 		return event
 	})

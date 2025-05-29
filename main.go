@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/GueyeCoder/termtrack/controller"
+	controller "github.com/GueyeCoder/termtrack/controle"
 	"github.com/GueyeCoder/termtrack/ui"
 	"github.com/rivo/tview"
 )

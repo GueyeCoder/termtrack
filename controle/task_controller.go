@@ -12,6 +12,17 @@ type TaskController struct {
 	filePath string
 }
 
+func NewTaskController(filePath string) (*TaskController, error) {
+	tasks, err := storage.LoadTasks(filePath)
+	if err != nil {
+		return nil, err
+	}
+	return &TaskController{
+		tasks:    tasks,
+		filePath: filePath,
+	}, nil
+}
+
 func (c *TaskController) GetAll() []model.Task {
 	return c.tasks
 }
@@ -37,4 +48,13 @@ func (c *TaskController) MarkDone(id int) error {
 		}
 	}
 	return errors.New("tâche non trouvée")
+}
+
+func (c *TaskController) Update(updatedTask model.Task) {
+	for i, t := range c.tasks {
+		if t.Title == updatedTask.Title {
+			(c.tasks)[i] = updatedTask
+			return
+		}
+	}
 }
